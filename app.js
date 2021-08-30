@@ -107,6 +107,7 @@ async function sendMedia(data) {
     }
 
 
+
     getUser(msg.from.replace(/@.*$/,"")).then((res) => {
 
       if (res.fields.name && !res.fields.age) {
