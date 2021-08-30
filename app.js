@@ -96,6 +96,8 @@ async function sendMedia(data) {
     let today = new Date();
     let curHr = today.getHours();
     let time;
+    let body = {};
+    let bodyText = {};
     if (curHr < 12) {
       time = 'this morning';
     } else if (curHr < 18) {
@@ -106,7 +108,6 @@ async function sendMedia(data) {
 
 
     getUser(msg.from.replace(/@.*$/,"")).then((res) => {
-      let bodyText = ''
 
       if (res.fields.name && !res.fields.age) {
         // gender not submited
@@ -285,7 +286,7 @@ async function sendMedia(data) {
               type: 'media',
               message: 'https://firebasestorage.googleapis.com/v0/b/my-pt-zim-fb13e.appspot.com/o/intro%2FINTRODUCTION%20TO%20ENTERPRENUERSHIP-lesson%202.pdf?alt=media&token=4c9cf3e2-0503-44c4-b0d9-7e94d86ec153'
             };
-            bodyText = {
+           bodyText = {
               type: 'text',
               message: '*Lesson 2  Idea generation* \n ' +
 
@@ -300,8 +301,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText)
-            sendMedia(body);
+            send_message(bodyText); sendMedia(body);
+
 
 
             break;
@@ -311,7 +312,7 @@ async function sendMedia(data) {
               type: 'media',
               message: 'https://firebasestorage.googleapis.com/v0/b/my-pt-zim-fb13e.appspot.com/o/intro%2FINTRODUCTION%20TO%20ENTERPRENUERSHIP-lesson%203.pdf?alt=media&token=a5d9174c-e707-40be-bff8-dc281c2c8183'
             };
-            let bodyText = {
+             bodyText = {
               type: 'text',
               message: '*Lesson 3 Business plan writing [part 1]* ' +
 
