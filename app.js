@@ -273,13 +273,10 @@ async function sendMedia(data) {
                   ' Type: *1B* for next lesson' +
                   '\n⬇️*Download this PDF for more*',
             };
-
-
-
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText).then(r=>{sendMedia(body)})
-            
+            send_message(bodyText)
+            sendMedia(body);
 
             break;
 
@@ -303,8 +300,9 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText).then(r=>{sendMedia(body)})
-            
+            send_message(bodyText)
+            sendMedia(body);
+
 
             break;
 
