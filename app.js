@@ -812,19 +812,15 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText).then(() => {
-              send_message(body);
-            });
+            send_message(bodyText)
+              sendMedia(body);
+
 
             break;
           case '5':
             body = {
               type: 'text',
-              message: '5. *Opportunities for the young people* \n' +
-
-                  '\n ' +
-                  "Type: *5A* for  Zimbabwe Tourism Authority innovation programme " + '\n' +
-                  "Type: *5B* for TEF Entrepreneurship Programme "
+              message: '5. *Opportunities for the young people* \n'
 
 
             };
@@ -833,43 +829,43 @@ async function sendMedia(data) {
             break;
 
 
-          case '5a':
-            body = {
-              type: 'text',
-              message: '5A. *Zimbabwe Tourism Authority Programme* \n' +
-
-                  "Are you a Zimbabwean innovator or start up?  Zimbabwe Tourism Authority is looking  for sustainable, disruptive and " +
-                  "innovative projects for Zimbabwe's tourism sector. The overall best project will receive seed funding and selected projects will" +
-                  " take part in a mentorship and incubation programme with industry leaders. Applicants should be 25 years &" +
-                  " below. The deadline for project submission is 30 June 2021. To enter visit ZTA website zimbabwetourism.net/innovation or email innovation@ztazim.co.zw"
-
-
-            };
-            body.to_number = msg.from;
-            send_message(body);
-
-            break;
-
-          case '5b':
-            body = {
-              type: 'text',
-              message: '5B. *TEF Entrepreneurship Programme* \n' +
-
-                  "The TEF Entrepreneurship Programme is the $100million commitment of Tony O. Elumelu, CON, an African investor and philanthropist, to identify, mentor, and fund 10,000 African entrepreneurs in 10 years, with the goal of creating millions of jobs and revenue on the continent.  With the support of partners, the Programme has scaled its commitment beyond its own commitment of funding 10,000 African entrepreneurs.\n" +
-                  "\n" +
-                  "\n" +
-                  "To apply, log on to the multilingual application portal on www.tefconnect.com to sign up.\n" +
-                  "\n" +
-                  "Click on “Apply” and fill the form.\n" +
-                  "\n" +
-                  " Due date is the 31st of March"
-
-
-            };
-            body.to_number = msg.from;
-            send_message(body);
-
-            break;
+          // case '5a':
+          //   body = {
+          //     type: 'text',
+          //     message: '5A. *Zimbabwe Tourism Authority Programme* \n' +
+          //
+          //         "Are you a Zimbabwean innovator or start up?  Zimbabwe Tourism Authority is looking  for sustainable, disruptive and " +
+          //         "innovative projects for Zimbabwe's tourism sector. The overall best project will receive seed funding and selected projects will" +
+          //         " take part in a mentorship and incubation programme with industry leaders. Applicants should be 25 years &" +
+          //         " below. The deadline for project submission is 30 June 2021. To enter visit ZTA website zimbabwetourism.net/innovation or email innovation@ztazim.co.zw"
+          //
+          //
+          //   };
+          //   body.to_number = msg.from;
+          //   send_message(body);
+          //
+          //   break;
+          //
+          // case '5b':
+          //   body = {
+          //     type: 'text',
+          //     message: '5B. *TEF Entrepreneurship Programme* \n' +
+          //
+          //         "The TEF Entrepreneurship Programme is the $100million commitment of Tony O. Elumelu, CON, an African investor and philanthropist, to identify, mentor, and fund 10,000 African entrepreneurs in 10 years, with the goal of creating millions of jobs and revenue on the continent.  With the support of partners, the Programme has scaled its commitment beyond its own commitment of funding 10,000 African entrepreneurs.\n" +
+          //         "\n" +
+          //         "\n" +
+          //         "To apply, log on to the multilingual application portal on www.tefconnect.com to sign up.\n" +
+          //         "\n" +
+          //         "Click on “Apply” and fill the form.\n" +
+          //         "\n" +
+          //         " Due date is the 31st of March"
+          //
+          //
+          //   };
+          //   body.to_number = msg.from;
+          //   send_message(body);
+          //
+          //   break;
 
           case '6':
             body = {
@@ -891,8 +887,9 @@ async function sendMedia(data) {
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
             send_message(bodyText).then(() => {
-              send_message(body);
+
             });
+            sendMedia(body);
             break;
           case '7':
             body = {
