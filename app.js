@@ -4,7 +4,6 @@ let { body, validationResult } = require('express-validator');
 const socketIO = require('socket.io');
 const qrcode = require('qrcode');
 const http = require('http');
-const fs = require('fs');
 const { phoneNumberFormatter } = require('./helpers/formatter');
 const fileUpload = require('express-fileupload');
 const axios = require('axios');
@@ -24,78 +23,34 @@ app.use(express.urlencoded({
 app.use(fileUpload({
   debug: true
 }));
+
 const db = require('./helpers/db.js');
 
-//const SESSION_FILE_PATH = './whatsapp-session.json';
-
-
-// let sessionCfg;
-// if (fs.existsSync(SESSION_FILE_PATH)) {
-//   sessionCfg = require(SESSION_FILE_PATH);
-// }
-
-
-app.get('/', (req, res) => {
-  res.sendFile('index.html', {
-    root: __dirname
-  });
-});
-
-const savedSession = await db.readSession();
-const client = new Client({
-  restartOnAuthFail: true,
-  puppeteer: {
-    headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--no-zygote',
-      '--single-process', // <- this one doesn't works in Windows
-      '--disable-gpu'
-    ],
-  },
-  session: savedSession
-});
-
-async function send_message(data) {
-  console.log(data)
-  const num = phoneNumberFormatter(data.to_number);
-
- await client.sendMessage(num, data.message).then(response => {
-    console.log(response)
-  }).catch(err => {
-    console.log(err)
+(async() => {
+  app.get('/', (req, res) => {
+    res.sendFile('index.html', {
+      root: __dirname
+    });
   });
 
-
-}
-
-
-
-async function sendMedia(data) {
-  const num = phoneNumberFormatter(data.to_number);
-  let mimetype;
-  const attachment = await axios.get(data.message, {
-    responseType: 'arraybuffer'
-  }).then(response => {
-    mimetype = response.headers['content-type'];
-    return response.data.toString('base64');
+  const savedSession = await db.readSession();
+  const client = new Client({
+    restartOnAuthFail: true,
+    puppeteer: {
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process', // <- this one doesn't works in Windows
+        '--disable-gpu'
+      ],
+    },
+    session: savedSession
   });
-
-  const media = new MessageMedia(mimetype, attachment, 'Media');
-
-  client.sendMessage(num, media, {
-    caption: 'file'
-  }).then(response => {
-
-  }).catch(err => {
-    console.log(err)
-
-  })
-}
 
   client.on('message', msg => {
     let today = new Date();
@@ -112,13 +67,12 @@ async function sendMedia(data) {
     }
 
 
-
-    getUser(msg.from.replace(/@.*$/,"")).then((res) => {
+    getUser(msg.from.replace(/@.*$/, "")).then((res) => {
 
       if (res.fields.name && !res.fields.age) {
         // gender not submited
 
-        patchUserAge(msg.from.replace(/@.*$/,""), msg.body).then((resp) => {
+        patchUserAge(msg.from.replace(/@.*$/, ""), msg.body).then((resp) => {
 
           body = {
             message: 'Its  a pleasure to meet you ' + res.fields.name.stringValue + '  , how may I be of help to you today? \n ' +
@@ -139,13 +93,12 @@ async function sendMedia(data) {
 
         }).catch((error) => {
         })
-      }
-      else if (res.fields.id && res.fields.name === undefined) {
+      } else if (res.fields.id && res.fields.name === undefined) {
         console.log(res);
         //name not submitedd
 
 
-        patchUsername(msg.from.replace(/@.*$/,""), msg.body).then((res) => {
+        patchUsername(msg.from.replace(/@.*$/, ""), msg.body).then((res) => {
           body = {
             message: 'Nice to meet you  , just of interest sake how old are you  and what is your gender\n' +
                 'eg type: *24  female* ', type: 'text'
@@ -156,9 +109,8 @@ async function sendMedia(data) {
         }).catch((error) => {
         })
 
-      }
-      else if(!res.fields.id && !res.fields.name && !res.fields.age){
-        postUser(msg.from.replace(/@.*$/,"")).then((res) => {
+      } else if (!res.fields.id && !res.fields.name && !res.fields.age) {
+        postUser(msg.from.replace(/@.*$/, "")).then((res) => {
 
           body = {
             message: 'Hello Hi, I am Shamwari a Youth Alliance for Safer Cities youth helper and adviser. I will be pleased to know who I am talking to.',
@@ -169,10 +121,8 @@ async function sendMedia(data) {
 
         }).catch((error) => {
         })
-      }
-
-      else {
-        console.log('lllll',msg.body.toLowerCase())
+      } else {
+        console.log('lllll', msg.body.toLowerCase())
 
         switch (msg.body.toLowerCase()) {
 
@@ -292,7 +242,7 @@ async function sendMedia(data) {
               type: 'media',
               message: 'https://firebasestorage.googleapis.com/v0/b/my-pt-zim-fb13e.appspot.com/o/intro%2FINTRODUCTION%20TO%20ENTERPRENUERSHIP-lesson%202.pdf?alt=media&token=4c9cf3e2-0503-44c4-b0d9-7e94d86ec153'
             };
-           bodyText = {
+            bodyText = {
               type: 'text',
               message: '*Lesson 2  Idea generation* \n ' +
 
@@ -307,8 +257,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
-
+            send_message(bodyText);
+            sendMedia(body);
 
 
             break;
@@ -318,7 +268,7 @@ async function sendMedia(data) {
               type: 'media',
               message: 'https://firebasestorage.googleapis.com/v0/b/my-pt-zim-fb13e.appspot.com/o/intro%2FINTRODUCTION%20TO%20ENTERPRENUERSHIP-lesson%203.pdf?alt=media&token=a5d9174c-e707-40be-bff8-dc281c2c8183'
             };
-             bodyText = {
+            bodyText = {
               type: 'text',
               message: '*Lesson 3 Business plan writing [part 1]* ' +
 
@@ -337,7 +287,8 @@ async function sendMedia(data) {
 
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case  '1d':
@@ -359,7 +310,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case  '1e':
@@ -385,7 +337,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case  '1f':
@@ -408,7 +361,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case  '1g':
@@ -432,7 +386,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
             // Part 2
@@ -470,7 +425,8 @@ async function sendMedia(data) {
 
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
 
             break;
 
@@ -510,7 +466,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case '2a2':
@@ -530,7 +487,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case '2a3':
@@ -553,7 +511,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
             /* case 2b*/
@@ -599,7 +558,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case '2b2':
@@ -624,7 +584,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
 
@@ -661,7 +622,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case '2c2':
@@ -678,7 +640,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
 
@@ -722,7 +685,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case '3b':
@@ -746,7 +710,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case '3c':
@@ -771,7 +736,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case '3d':
@@ -796,7 +762,8 @@ async function sendMedia(data) {
             };
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
-            send_message(bodyText); sendMedia(body);
+            send_message(bodyText);
+            sendMedia(body);
             break;
 
           case '4':
@@ -818,7 +785,7 @@ async function sendMedia(data) {
             bodyText.to_number = msg.from;
             body.to_number = msg.from;
             send_message(bodyText)
-              sendMedia(body);
+            sendMedia(body);
 
 
             break;
@@ -834,43 +801,43 @@ async function sendMedia(data) {
             break;
 
 
-          // case '5a':
-          //   body = {
-          //     type: 'text',
-          //     message: '5A. *Zimbabwe Tourism Authority Programme* \n' +
-          //
-          //         "Are you a Zimbabwean innovator or start up?  Zimbabwe Tourism Authority is looking  for sustainable, disruptive and " +
-          //         "innovative projects for Zimbabwe's tourism sector. The overall best project will receive seed funding and selected projects will" +
-          //         " take part in a mentorship and incubation programme with industry leaders. Applicants should be 25 years &" +
-          //         " below. The deadline for project submission is 30 June 2021. To enter visit ZTA website zimbabwetourism.net/innovation or email innovation@ztazim.co.zw"
-          //
-          //
-          //   };
-          //   body.to_number = msg.from;
-          //   send_message(body);
-          //
-          //   break;
-          //
-          // case '5b':
-          //   body = {
-          //     type: 'text',
-          //     message: '5B. *TEF Entrepreneurship Programme* \n' +
-          //
-          //         "The TEF Entrepreneurship Programme is the $100million commitment of Tony O. Elumelu, CON, an African investor and philanthropist, to identify, mentor, and fund 10,000 African entrepreneurs in 10 years, with the goal of creating millions of jobs and revenue on the continent.  With the support of partners, the Programme has scaled its commitment beyond its own commitment of funding 10,000 African entrepreneurs.\n" +
-          //         "\n" +
-          //         "\n" +
-          //         "To apply, log on to the multilingual application portal on www.tefconnect.com to sign up.\n" +
-          //         "\n" +
-          //         "Click on “Apply” and fill the form.\n" +
-          //         "\n" +
-          //         " Due date is the 31st of March"
-          //
-          //
-          //   };
-          //   body.to_number = msg.from;
-          //   send_message(body);
-          //
-          //   break;
+            // case '5a':
+            //   body = {
+            //     type: 'text',
+            //     message: '5A. *Zimbabwe Tourism Authority Programme* \n' +
+            //
+            //         "Are you a Zimbabwean innovator or start up?  Zimbabwe Tourism Authority is looking  for sustainable, disruptive and " +
+            //         "innovative projects for Zimbabwe's tourism sector. The overall best project will receive seed funding and selected projects will" +
+            //         " take part in a mentorship and incubation programme with industry leaders. Applicants should be 25 years &" +
+            //         " below. The deadline for project submission is 30 June 2021. To enter visit ZTA website zimbabwetourism.net/innovation or email innovation@ztazim.co.zw"
+            //
+            //
+            //   };
+            //   body.to_number = msg.from;
+            //   send_message(body);
+            //
+            //   break;
+            //
+            // case '5b':
+            //   body = {
+            //     type: 'text',
+            //     message: '5B. *TEF Entrepreneurship Programme* \n' +
+            //
+            //         "The TEF Entrepreneurship Programme is the $100million commitment of Tony O. Elumelu, CON, an African investor and philanthropist, to identify, mentor, and fund 10,000 African entrepreneurs in 10 years, with the goal of creating millions of jobs and revenue on the continent.  With the support of partners, the Programme has scaled its commitment beyond its own commitment of funding 10,000 African entrepreneurs.\n" +
+            //         "\n" +
+            //         "\n" +
+            //         "To apply, log on to the multilingual application portal on www.tefconnect.com to sign up.\n" +
+            //         "\n" +
+            //         "Click on “Apply” and fill the form.\n" +
+            //         "\n" +
+            //         " Due date is the 31st of March"
+            //
+            //
+            //   };
+            //   body.to_number = msg.from;
+            //   send_message(body);
+            //
+            //   break;
 
           case '6':
             body = {
@@ -927,64 +894,7 @@ async function sendMedia(data) {
     });
 
 
-    // if (msg.body == 'hi') {
-    //
-    //
-    // } else if (msg.body == 'good morning') {
-    //   msg.reply('selamat pagi');
-    // } else if (msg.body == '!groups') {
-    //   client.getChats().then(chats => {
-    //     const groups = chats.filter(chat => chat.isGroup);
-    //
-    //     if (groups.length == 0) {
-    //       msg.reply('You have no group yet.');
-    //     } else {
-    //       let replyMsg = '*YOUR GROUPS*\n\n';
-    //       groups.forEach((group, i) => {
-    //         replyMsg += `ID: ${group.id._serialized}\nName: ${group.name}\n\n`;
-    //       });
-    //       replyMsg += '_You can use the group id to send a message to the group._'
-    //       msg.reply(replyMsg);
-    //     }
-    //   });
-    // }
 
-    // Downloading media
-    // if (msg.hasMedia) {
-    //   msg.downloadMedia().then(media => {
-    //     // To better understanding
-    //     // Please look at the console what data we get
-    //     console.log(media);
-    //
-    //     if (media) {
-    //       // The folder to store: change as you want!
-    //       // Create if not exists
-    //       const mediaPath = './downloaded-media/';
-    //
-    //       if (!fs.existsSync(mediaPath)) {
-    //         fs.mkdirSync(mediaPath);
-    //       }
-    //
-    //       // Get the file extension by mime-type
-    //       const extension = mime.extension(media.mimetype);
-    //
-    //       // Filename: change as you want!
-    //       // I will use the time for this example
-    //       // Why not use media.filename? Because the value is not certain exists
-    //       const filename = new Date().getTime();
-    //
-    //       const fullFilename = mediaPath + filename + '.' + extension;
-    //
-    //       // Save to file
-    //       try {
-    //         fs.writeFileSync(fullFilename, media.data, {encoding: 'base64'});
-    //         console.log('File downloaded successfully!', fullFilename);
-    //       } catch (err) {
-    //         console.log('Failed to save the file:', err);
-    //       }
-    //     }
-    //   });
-    // }
   });
 
   client.initialize();
@@ -1038,11 +948,6 @@ async function sendMedia(data) {
     });
   });
 
-
-  const checkRegisteredNumber = async function (number) {
-    const isRegistered = await client.isRegisteredUser(number);
-    return isRegistered;
-  }
 
 // Send message
   app.post('/send-message', [
@@ -1228,8 +1133,45 @@ async function sendMedia(data) {
   });
 
 
+  async function sendMedia(data) {
+    const num = phoneNumberFormatter(data.to_number);
+    let mimetype;
+    const attachment = await axios.get(data.message, {
+      responseType: 'arraybuffer'
+    }).then(response => {
+      mimetype = response.headers['content-type'];
+      return response.data.toString('base64');
+    });
+
+    const media = new MessageMedia(mimetype, attachment, 'Media');
+
+    client.sendMessage(num, media, {
+      caption: 'file'
+    }).then(response => {
+
+    }).catch(err => {
+      console.log(err)
+
+    })
+  }
+  const checkRegisteredNumber = async function (number) {
+    const isRegistered = await client.isRegisteredUser(number);
+    return isRegistered;
+  }
+  async function send_message(data) {
+    console.log(data)
+    const num = phoneNumberFormatter(data.to_number);
+
+    await client.sendMessage(num, data.message).then(response => {
+      console.log(response)
+    }).catch(err => {
+      console.log(err)
+    });
+
+
+  }
   async function getUser(id) {
-   // const i = phoneNumberFormatter(id);
+    // const i = phoneNumberFormatter(id);
     let url = 'https://firestore.googleapis.com/v1/projects/my-pt-zim-fb13e/databases/(default)/documents/users/' + id;
     let response = await rp(url, {
       method: 'get',
@@ -1302,7 +1244,7 @@ async function sendMedia(data) {
   }
 
   async function patchUsername(id, name) {
-  //  const i = phoneNumberFormatter(id);
+    //  const i = phoneNumberFormatter(id);
 
     var body = {
       "fields": {
@@ -1324,8 +1266,7 @@ async function sendMedia(data) {
     return response;
   }
 
-
-  server.listen(port, function () {
+  server.listen(port, function() {
     console.log('App running on *: ' + port);
   });
-
+})();
