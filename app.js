@@ -24,12 +24,15 @@ app.use(express.urlencoded({
 app.use(fileUpload({
   debug: true
 }));
+const db = require('./helpers/db.js');
 
-const SESSION_FILE_PATH = './whatsapp-session.json';
-let sessionCfg;
-if (fs.existsSync(SESSION_FILE_PATH)) {
-  sessionCfg = require(SESSION_FILE_PATH);
-}
+//const SESSION_FILE_PATH = './whatsapp-session.json';
+
+
+// let sessionCfg;
+// if (fs.existsSync(SESSION_FILE_PATH)) {
+//   sessionCfg = require(SESSION_FILE_PATH);
+// }
 
 app.get('/', (req, res) => {
   res.sendFile('index.html', {
@@ -37,6 +40,7 @@ app.get('/', (req, res) => {
   });
 });
 
+const savedSession = await db.readSession();
 const client = new Client({
   restartOnAuthFail: true,
   puppeteer: {
@@ -52,7 +56,7 @@ const client = new Client({
       '--disable-gpu'
     ],
   },
-  session: sessionCfg
+  session: savedSession
 });
 
 async function send_message(data) {
@@ -1005,12 +1009,15 @@ async function sendMedia(data) {
       socket.emit('authenticated', 'Whatsapp is authenticated!');
       socket.emit('message', 'Whatsapp is authenticated!');
       console.log('AUTHENTICATED', session);
-      sessionCfg = session;
-      fs.writeFile(SESSION_FILE_PATH, JSON.stringify(session), function (err) {
-        if (err) {
-          console.error(err);
-        }
-      });
+
+      db.saveSession(session);
+
+      // sessionCfg = session;
+      // fs.writeFile(SESSION_FILE_PATH, JSON.stringify(session), function (err) {
+      //   if (err) {
+      //     console.error(err);
+      //   }
+      // });
     });
 
     client.on('auth_failure', function (session) {
@@ -1019,10 +1026,12 @@ async function sendMedia(data) {
 
     client.on('disconnected', (reason) => {
       socket.emit('message', 'Whatsapp is disconnected!');
-      fs.unlinkSync(SESSION_FILE_PATH, function (err) {
-        if (err) return console.log(err);
-        console.log('Session file deleted!');
-      });
+      db.removeSession();
+
+      // fs.unlinkSync(SESSION_FILE_PATH, function (err) {
+      //   if (err) return console.log(err);
+      //   console.log('Session file deleted!');
+      // });
       client.destroy();
       client.initialize();
     });
