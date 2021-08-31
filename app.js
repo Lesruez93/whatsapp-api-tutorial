@@ -34,6 +34,7 @@ const db = require('./helpers/db.js');
 //   sessionCfg = require(SESSION_FILE_PATH);
 // }
 
+
 app.get('/', (req, res) => {
   res.sendFile('index.html', {
     root: __dirname
