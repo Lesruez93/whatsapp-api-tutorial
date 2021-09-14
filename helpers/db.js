@@ -22,6 +22,7 @@ const readSession = async () => {
     }
 }
 
+
 const saveSession = (session) => {
     client.query('INSERT INTO wa_seesions (session) VALUES($1)', [session], (err, results) => {
         if (err) {
