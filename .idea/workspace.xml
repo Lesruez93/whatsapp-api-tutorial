@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cdbffbe2-3ff8-497f-a29a-6528178cd880" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="cdbffbe2-3ff8-497f-a29a-6528178cd880" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -38,7 +36,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.start:dev">
+  <component name="RunManager" selected="npm.start">
     <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -61,8 +59,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.start:dev" />
         <item itemvalue="npm.start" />
+        <item itemvalue="npm.start:dev" />
       </list>
     </recent_temporary>
   </component>
@@ -78,6 +76,8 @@
       <workItem from="1630420922483" duration="322000" />
       <workItem from="1631603407502" duration="438000" />
       <workItem from="1631609817569" duration="944000" />
+      <workItem from="1631725186711" duration="1406000" />
+      <workItem from="1635070832847" duration="427000" />
     </task>
     <servers />
   </component>
