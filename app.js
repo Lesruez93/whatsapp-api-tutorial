@@ -65,12 +65,13 @@ const db = require('./helpers/db.js');
     } else {
       time = 'this evening';
     }
-
+console.log(msg)
 
     getUser(msg.from.replace(/@.*$/, "")).then((res) => {
+      console.log(res)
 
       if (res.fields.name && !res.fields.age) {
-        // gender not submited
+        console.log("gender not submited")
 
         patchUserAge(msg.from.replace(/@.*$/, ""), msg.body).then((resp) => {
 
@@ -95,7 +96,7 @@ const db = require('./helpers/db.js');
         })
       } else if (res.fields.id && res.fields.name === undefined) {
         console.log(res);
-        //name not submitedd
+        console.log("name not submitedd")
 
 
         patchUsername(msg.from.replace(/@.*$/, ""), msg.body).then((res) => {
@@ -120,6 +121,7 @@ const db = require('./helpers/db.js');
           send_message(body);
 
         }).catch((error) => {
+          console.log(error)
         })
       } else {
         console.log('lllll', msg.body.toLowerCase())
@@ -889,15 +891,27 @@ const db = require('./helpers/db.js');
       }
 
     }).catch((error) => {
+console.log(error)
+      postUser(msg.from.replace(/@.*$/, "")).then((res) => {
 
+        body = {
+          message: 'Hello Hi, I am Shamwari a Youth Alliance for Safer Cities youth helper and adviser. I will be pleased to know who I am talking to.',
+          type: 'text'
+        };
+        body.to_number = msg.from;
+        send_message(body);
 
-    });
+      }).catch((error) => {
+        console.log(error)
+      })
+
+    })
 
 
 
   });
 
-  client.initialize();
+  await client.initialize();
 
 // Socket IO
   io.on('connection', function (socket) {
@@ -936,6 +950,7 @@ const db = require('./helpers/db.js');
     });
 
     client.on('disconnected', (reason) => {
+      console.log(reason)
       socket.emit('message', 'Whatsapp is disconnected!');
       db.removeSession();
 
@@ -979,7 +994,7 @@ const db = require('./helpers/db.js');
       });
     }
 
-    client.send_message(number, message).then(response => {
+    client.sendMessage(number, message).then(response => {
       res.status(200).json({
         status: true,
         response: response
@@ -1075,7 +1090,7 @@ const db = require('./helpers/db.js');
       chatId = group.id._serialized;
     }
 
-    client.send_message(chatId, message).then(response => {
+    client.sendMessage(chatId, message).then(response => {
       res.status(200).json({
         status: true,
         response: response
@@ -1143,7 +1158,7 @@ const db = require('./helpers/db.js');
       return response.data.toString('base64');
     });
 
-    const media = new MessageMedia(mimetype, attachment, 'Media');
+    const media = new MessageMedia(mimetype, attachment, 'PDF');
 
     client.sendMessage(num, media, {
       caption: 'file'
@@ -1171,7 +1186,7 @@ const db = require('./helpers/db.js');
 
   }
   async function getUser(id) {
-    // const i = phoneNumberFormatter(id);
+console.log(id)
     let url = 'https://firestore.googleapis.com/v1/projects/my-pt-zim-fb13e/databases/(default)/documents/users/' + id;
     let response = await rp(url, {
       method: 'get',
@@ -1181,6 +1196,7 @@ const db = require('./helpers/db.js');
 
       },
     });
+    console.log(response)
     return response;
   }
 
@@ -1198,6 +1214,7 @@ const db = require('./helpers/db.js');
   }
 
   async function postUser(id) {
+    console.log(id)
     const i = phoneNumberFormatter(id);
 
     var body = {

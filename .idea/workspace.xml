@@ -29,6 +29,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
@@ -77,7 +78,7 @@
       <workItem from="1631603407502" duration="438000" />
       <workItem from="1631609817569" duration="944000" />
       <workItem from="1631725186711" duration="1406000" />
-      <workItem from="1635070832847" duration="427000" />
+      <workItem from="1635070832847" duration="9279000" />
     </task>
     <servers />
   </component>
